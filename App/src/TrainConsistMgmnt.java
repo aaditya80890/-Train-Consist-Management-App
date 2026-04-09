@@ -1,51 +1,59 @@
-public class TrainConsistMgmnt {
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
-    // ===============================
-    // Custom Exception
-    // ===============================
-    static class InvalidCapacityException extends Exception {
-        public InvalidCapacityException(String message) {
-            super(message);
-        }
+public class TrainConsistMgmntTest {
+
+    @Test
+    void testCargo_SafeAssignment() {
+        TrainConsistMgmnt.GoodsBogie bogie =
+                new TrainConsistMgmnt.GoodsBogie("Cylindrical");
+
+        bogie.assignCargo("Petroleum");
+
+        assertEquals("Petroleum", bogie.cargo);
     }
 
-    // ===============================
-    // Passenger Bogie Model
-    // ===============================
-    static class PassengerBogie {
-        String type;
-        int capacity;
+    @Test
+    void testCargo_UnsafeAssignmentHandled() {
+        TrainConsistMgmnt.GoodsBogie bogie =
+                new TrainConsistMgmnt.GoodsBogie("Rectangular");
 
-        PassengerBogie(String type, int capacity) throws InvalidCapacityException {
-            if (capacity <= 0) {
-                throw new InvalidCapacityException("Capacity must be greater than zero");
-            }
+        bogie.assignCargo("Petroleum");
 
-            this.type = type;
-            this.capacity = capacity;
-        }
+        assertNull(bogie.cargo);
     }
 
-    // ===============================
-    // Main Method
-    // ===============================
-    public static void main(String[] args) {
+    @Test
+    void testCargo_CargoNotAssignedAfterFailure() {
+        TrainConsistMgmnt.GoodsBogie bogie =
+                new TrainConsistMgmnt.GoodsBogie("Rectangular");
 
-        System.out.println("======================================");
-        System.out.println("UC14 - Handle Invalid Bogie Capacity");
-        System.out.println("======================================");
+        bogie.assignCargo("Petroleum");
 
-        try {
-            PassengerBogie bogie1 = new PassengerBogie("Sleeper", 72);
-            System.out.println("Created Bogie: " + bogie1.type + " -> " + bogie1.capacity);
+        assertNull(bogie.cargo);
+    }
 
-            PassengerBogie bogie2 = new PassengerBogie("AC Chair", 0); // invalid
-            System.out.println("Created Bogie: " + bogie2.type + " -> " + bogie2.capacity);
+    @Test
+    void testCargo_ProgramContinuesAfterException() {
+        TrainConsistMgmnt.GoodsBogie bogie1 =
+                new TrainConsistMgmnt.GoodsBogie("Rectangular");
 
-        } catch (InvalidCapacityException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+        TrainConsistMgmnt.GoodsBogie bogie2 =
+                new TrainConsistMgmnt.GoodsBogie("Cylindrical");
 
-        System.out.println("\nUC14 exception handling completed...");
+        bogie1.assignCargo("Petroleum");
+        bogie2.assignCargo("Coal");
+
+        assertEquals("Coal", bogie2.cargo);
+    }
+
+    @Test
+    void testCargo_FinallyBlockExecution() {
+        TrainConsistMgmnt.GoodsBogie bogie =
+                new TrainConsistMgmnt.GoodsBogie("Rectangular");
+
+        bogie.assignCargo("Petroleum");
+
+        assertNull(bogie.cargo); // finally always runs, cargo remains null
     }
 }
